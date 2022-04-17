@@ -9,6 +9,12 @@ interface IAlbum {
   isSelect: boolean;
 }
 
+const milistToMinute = (milis: number) => {
+  const minutes: number = Math.floor(milis/60000);
+  const seconds = ((milis % 60000) / 1000).toFixed(0);
+  return minutes + ":" + (parseFloat(seconds) < 10 ? '0' : '') + seconds + ' minutes';
+}
+
 const Album = ({ image, title, artist, duration, select, isSelect}: IAlbum) => (
   <SongTrack>
     <SongLogo>
@@ -17,7 +23,7 @@ const Album = ({ image, title, artist, duration, select, isSelect}: IAlbum) => (
     <DetailTrack>
       <h1>{title}</h1>
       <p>{artist}</p>
-      <p>{duration}</p>
+      <p>{milistToMinute(parseInt(duration))}</p>
       <button onClick={select}>{isSelect ? 'Select' : 'Deselect'}</button>
     </DetailTrack>
   </SongTrack>
