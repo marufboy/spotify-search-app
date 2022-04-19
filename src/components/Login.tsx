@@ -36,7 +36,6 @@ export default function Login() {
       dispatch(setToken(access_token));
       history.push('/create-playlist');
       window.location.hash = "";
-
     }
   }, [globToken, dispatch]);
   return (

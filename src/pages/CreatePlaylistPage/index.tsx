@@ -1,20 +1,20 @@
 import styled from "@emotion/styled";
 import axios from "axios";
-import { ChangeEvent, MouseEvent, FormEvent, useState, useEffect } from "react";
+import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import SearchBar from "../../components/SearchBar";
 import { useAppSelector } from "../../hooks";
-import TabButton from "../../components/TabButton";
-import CreatePlaylist from "../../components/CreatePlaylist";
 import TrackContainer from "./container/TrackContainer";
-
+import { Button } from "@mantine/core";
+import { CirclePlus } from "tabler-icons-react";
+import { ModalPlaylist } from "../../components/ModalPLaylist";
 
 export function CreatePlaylistPage() {
   const [search, setSearch] = useState<string | null>();
-  const [tracks, setTracks] = useState<any[]>([]);
+  const [tracks, setTracks] = useState([]);
   const [user, setUser] = useState([]);
   const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
   const [playlist, setPlaylist] = useState({ name: "", description: "" });
-  const [boolTab, setBoolTab] = useState<boolean>(true);
+  const [opened, setOpened] = useState<boolean>(false);
 
   const globToken = useAppSelector((state) => state.token.value);
 
@@ -37,6 +37,7 @@ export function CreatePlaylistPage() {
         const items = res.data.tracks.items;
         setTracks(items);
         console.log(items);
+        console.log('this is typeof items',typeof items);
       });
   };
 
@@ -114,14 +115,6 @@ export function CreatePlaylistPage() {
     }
   };
 
-  const handleTab = (e: MouseEvent) => {
-    if ((e.target as HTMLInputElement).value === "search") {
-      setBoolTab(true);
-    } else {
-      setBoolTab(false);
-    }
-  };
-
   const handleFormChange = (e: ChangeEvent) => {
     const { name, value } = e.target as HTMLInputElement;
     setPlaylist({ ...playlist, [name]: value });
@@ -133,16 +126,25 @@ export function CreatePlaylistPage() {
 
   return (
     <Container>
-      <TabButton handleTab={handleTab} />
-      {boolTab ? (
+      <InputContainer>
         <SearchBar handleInput={handleInput} handleSubmit={handleTracks} />
-      ) : (
-        <CreatePlaylist
+        {selectedTracks.length > 0 && (
+          <Button
+            leftIcon={<CirclePlus color="white" size={18} />}
+            color="green"
+            onClick={() => setOpened(true)}
+          >
+            Create Playlist
+          </Button>
+        )}
+      </InputContainer>
+      <ModalPlaylist
+          isOpen={opened}
+          setModal={setOpened}
           playlist={playlist}
           handleFormChange={handleFormChange}
           handleFormSubmit={handlePlaylist}
         />
-      )}
       <TrackContainer
         tracks={tracks}
         selectedTracks={selectedTracks}
@@ -156,8 +158,17 @@ const Container = styled.div`
   display: flex;
   width: 100%;
   min-height: 100vh;
-  align-items: center;
+  align-items: flex-start;
   flex-direction: column;
   background: linear-gradient(transparent, rgba(0, 0, 0, 1));
   background-color: #333;
+`;
+
+const InputContainer = styled.div`
+  display: flex;
+  flex-direction: row;
+  margin-top: 20px;
+  margin-left: 25px;
+  gap: 1.2rem;
+  justify-content: flex-start;
 `;

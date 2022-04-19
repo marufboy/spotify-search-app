@@ -10,12 +10,16 @@ interface ISongs {
 }
 
 interface ITrackContainer {
-  tracks : ISongs[];
+  tracks: ISongs[];
   selectedTracks: string[];
   handleSelected: (id: string) => void;
 }
 
-const TrackContainer = ({ tracks, selectedTracks, handleSelected } : ITrackContainer) => {
+const TrackContainer = ({
+  tracks,
+  selectedTracks,
+  handleSelected,
+}: ITrackContainer) => {
   return (
     <TracksContainer>
       {tracks.length > 0 &&
