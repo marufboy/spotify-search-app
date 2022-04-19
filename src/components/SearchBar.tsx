@@ -1,5 +1,7 @@
 import styled from "@emotion/styled";
+import { Button } from "@mantine/core";
 import { ChangeEvent, FormEvent } from "react";
+
 
 interface ISearch {
   handleInput: (e: ChangeEvent) => void;
@@ -9,15 +11,15 @@ interface ISearch {
 const SearchBar = ({ handleInput, handleSubmit }: ISearch) => (
   <Form onSubmit={handleSubmit}>
     <SearchInput onChange={handleInput} />
-    <SearchButton>Search</SearchButton>
+    <Button color="green" type="submit">
+      Search
+    </Button>
   </Form>
 );
 
 export default SearchBar;
 
 const Form = styled.form`
-  margin-top: 20px;
-  width: 80vw;
   display: flex;
   gap: 1.2rem;
   justify-content: flex-start;
@@ -34,21 +36,5 @@ const SearchInput = styled.input`
   &:focus {
     box-shadow: #009688 0 0 0 0.2rem;
     border-color: #009688;
-  }
-`;
-
-const SearchButton = styled.button`
-  max-width: 150px;
-  background-color: #1f1f1f;
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  text-decoration: none;
-  display: inline-block;
-  font-size: 16px;
-  border-radius: 10px;
-  transition: 0.3s ease-in-out;
-  &:hover {
-    background-color: #009688;
   }
 `;
