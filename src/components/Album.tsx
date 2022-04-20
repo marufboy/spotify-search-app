@@ -1,4 +1,5 @@
 import styled from "@emotion/styled";
+import { Button } from "@mantine/core";
 
 interface IAlbum {
   image: string;
@@ -10,12 +11,25 @@ interface IAlbum {
 }
 
 const milistToMinute = (milis: number) => {
-  const minutes: number = Math.floor(milis/60000);
+  const minutes: number = Math.floor(milis / 60000);
   const seconds = ((milis % 60000) / 1000).toFixed(0);
-  return minutes + ":" + (parseFloat(seconds) < 10 ? '0' : '') + seconds + ' minutes';
-}
+  return (
+    minutes + ":" + (parseFloat(seconds) < 10 ? "0" : "") + seconds + " minutes"
+  );
+};
 
-const Album = ({ image, title, artist, duration, select, isSelect}: IAlbum) => (
+const colorButton = (isSelect: boolean) => {
+  return isSelect ? "teal" : "gray";
+};
+
+const Album = ({
+  image,
+  title,
+  artist,
+  duration,
+  select,
+  isSelect,
+}: IAlbum) => (
   <SongTrack>
     <SongLogo>
       <img src={image} alt="album image" />
@@ -24,7 +38,10 @@ const Album = ({ image, title, artist, duration, select, isSelect}: IAlbum) => (
       <h1>{title}</h1>
       <p>{artist}</p>
       <p>{milistToMinute(parseInt(duration))}</p>
-      <button onClick={select}>{isSelect ? 'Select' : 'Deselect'}</button>
+      <Button color={colorButton(isSelect)} onClick={select}>
+        {isSelect ? "Select" : "Deselect"}
+      </Button>
+      {/* <button onClick={select}>{isSelect ? 'Select' : 'Deselect'}</button> */}
     </DetailTrack>
   </SongTrack>
 );
@@ -57,7 +74,7 @@ const DetailTrack = styled.div`
   color: white;
   h1 {
     line-height: 5px;
-    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-size: 1.5rem;
     font-weight: bold;
     color: white;
