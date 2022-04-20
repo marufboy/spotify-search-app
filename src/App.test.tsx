@@ -5,7 +5,8 @@ import { Provider } from "react-redux";
 import { MantineProvider } from "@mantine/core";
 import { CreatePlaylistPage } from "./pages/CreatePlaylistPage";
 
-test("renders learn react link", async () => {
+
+test("should render search page properly", async () => {
   render(
     <Provider store={store}>
       <MantineProvider theme={{ colorScheme: "dark" }}>
@@ -13,6 +14,7 @@ test("renders learn react link", async () => {
       </MantineProvider>
     </Provider>
   );
+
   const SearchElement = screen.getByText(/Search/i);
 
   const InputElement = screen.getByRole("textbox");
@@ -20,15 +22,10 @@ test("renders learn react link", async () => {
   fireEvent.change(InputElement, { target: { value: "tulus" } });
 
   userEvent.click(SearchElement);
-  
-  //check input & button Search Bar
-  expect(InputElement).toBeInTheDocument();
-  expect(SearchElement).toBeInTheDocument();
 
-  //Check track item are visible
-  expect(await screen.findByRole('heading', {name: /diri/i})).toBeVisible();
+  expect( await screen.findAllByText('Search')).toBeInTheDocument();
+  expect( await screen.findByRole('textbox')).toBeInTheDocument();
 
-  const SelectElement = screen.getByRole('button', {name: /select/i});
-
-  expect(SelectElement).toBeInTheDocument();
+  expect( await screen.findAllByText('Tulus')).toBeVisible();
+  expect( await screen.findAllByText('Diri')).toBeVisible();
 });

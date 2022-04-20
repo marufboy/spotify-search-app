@@ -5,7 +5,7 @@ const _url = 'https://api.spotify.com/v1/search?q=tulus&type=track&limit=16&offs
 
 export const handlers = [
     rest.get(_url, (req, res, ctx) => {
-        console.debug(`${req.headers}`)
+        console.debug(`${req.url.searchParams}`)
         return res(ctx.json(MockTrackResponse))
     })
 ]
