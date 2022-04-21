@@ -1,31 +1,32 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "./store/test-utils";
 import userEvent from "@testing-library/user-event";
 import { store } from "./store";
 import { Provider } from "react-redux";
-import { MantineProvider } from "@mantine/core";
 import { CreatePlaylistPage } from "./pages/CreatePlaylistPage";
 
+test("should render search page properly", () => {
+  const access_token =
+    "BQBeNIQogiY5ErqwVe_aYqQX5mfJcR9Ydi8yO2AgW0OOWZeA3MBN4-_KfFu8h8JmawUyCIJgRKiCLnW2OLt6n57ahX_ae7JgCI8ylgcKh8CTW-bEUoFLO1Yd9mnZqar20woNd1qAQ0f8HQwCNee0mYtbKxesqi5rewRyr_pH-u2S0S-32CfUokJBR-xDXCCaKalHbmz6pwMZ6EHdSR1cQLutqEUqKzk";
 
-test("should render search page properly", async () => {
   render(
     <Provider store={store}>
-      <MantineProvider theme={{ colorScheme: "dark" }}>
-        <CreatePlaylistPage />
-      </MantineProvider>
-    </Provider>
+      <CreatePlaylistPage />
+    </Provider>,
+    {
+      preloadedState: {
+        token: { value: access_token },
+      },
+    }
   );
 
   const SearchElement = screen.getByText(/Search/i);
 
   const InputElement = screen.getByRole("textbox");
 
-  fireEvent.change(InputElement, { target: { value: "tulus" } });
+  expect(SearchElement).toBeInTheDocument();
+  expect(InputElement).toBeInTheDocument();
 
-  userEvent.click(SearchElement);
+  userEvent.type(InputElement, "tulus");
 
-  expect( await screen.findAllByText('Search')).toBeInTheDocument();
-  expect( await screen.findByRole('textbox')).toBeInTheDocument();
-
-  expect( await screen.findAllByText('Tulus')).toBeVisible();
-  expect( await screen.findAllByText('Diri')).toBeVisible();
+  expect(screen.getByDisplayValue(/tulus/i)).toBeVisible();
 });

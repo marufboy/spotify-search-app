@@ -6,7 +6,7 @@ interface ISongs {
   name: string;
   artists: { name: string }[];
   album: { images: { url: string }[] };
-  duration_ms: string;
+  duration_ms: number;
 }
 
 interface ITrackContainer {
@@ -53,12 +53,10 @@ const TrackContainer = ({
 export default TrackContainer;
 
 const TracksContainer = styled.div`
-  width: 100%;
-  display: inline-grid;
+  margin: 0 auto;
+  display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-gap: 3px;
-  justify-items: center;
-  align-items: center;
+  grid-gap: 10px;
   margin-top: 20px;
   margin-bottom: 20px;
 `;

@@ -1,17 +1,19 @@
 import styled from "@emotion/styled";
-import axios from "axios";
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import SearchBar from "../../components/SearchBar";
 import { useAppSelector } from "../../hooks";
 import TrackContainer from "./container/TrackContainer";
 import { Button } from "@mantine/core";
 import { CirclePlus } from "tabler-icons-react";
-import { ModalPlaylist } from "../../components/ModalPLaylist";
+import { ModalComponents } from "../../components/ModalComponents";
+import { getTracks, getUser, postPlaylist, postTrackToPlaylist } from "./lib";
+import NavBarContainer from "./container/NavBarContainer";
+import { FormPlaylist } from "../../components/FormPlaylist";
 
 export function CreatePlaylistPage() {
-  const [search, setSearch] = useState<string | null>();
+  const [search, setSearch] = useState<string>("");
   const [tracks, setTracks] = useState([]);
-  const [user, setUser] = useState([]);
+  const [user, setUser] = useState("");
   const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
   const [playlist, setPlaylist] = useState({ name: "", description: "" });
   const [opened, setOpened] = useState<boolean>(false);
@@ -24,58 +26,27 @@ export function CreatePlaylistPage() {
   const handleTracks = async (e: FormEvent) => {
     e.preventDefault();
     const uri = `https://api.spotify.com/v1/search?q=${search}&type=track`;
-    axios
-      .get(uri, {
-        params: { limit: 16, offset: 0 },
-        headers: {
-          Accept: "application/json",
-          Authorization: "Bearer " + globToken,
-          "Content-Type": "application/json",
-        },
-      })
+    getTracks(globToken, uri)
       .then((res) => {
-        const items = res.data.tracks.items;
-        setTracks(items);
-        console.log(items);
-        console.log('this is typeof items',typeof items);
-      });
+        console.log(JSON.stringify(res.data.tracks.items, null, 2));
+        const data = res.data.tracks.items;
+        setTracks(data);
+      })
+      .catch((err) => console.log(err));
   };
 
   const handlePlaylist = async (e: FormEvent) => {
     e.preventDefault();
-    if (
-      playlist.name.length > 10 &&
-      playlist.description !== "" &&
-      tracks.length > 0
-    ) {
+    if (playlist.name.length > 10 && playlist.description !== "") {
       const data = {
         name: playlist.name,
         description: playlist.description,
         public: false,
       };
-      axios
-        .post(`https://api.spotify.com/v1/users/${user}/playlists`, data, {
-          headers: {
-            Accept: "application/json",
-            // Authorization: "Bearer " + token,
-            Authorization: "Bearer " + globToken,
-            "Content-Type": "application/json",
-          },
-        })
+      postPlaylist(globToken, user, data)
         .then((res) => {
           const playlistID = res.data.id;
-          axios.post(
-            `https://api.spotify.com/v1/users/${user}/playlists/${playlistID}/tracks`,
-            tracks,
-            {
-              headers: {
-                Accept: "application/json",
-                // Authorization: "Bearer " + token,
-                Authorization: "Bearer " + globToken,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          postTrackToPlaylist(globToken, user, playlistID, selectedTracks);
         })
         .catch((err) => console.log(err.message));
 
@@ -89,15 +60,7 @@ export function CreatePlaylistPage() {
 
   const handleUser = async () => {
     if (globToken !== "") {
-      axios
-        .get(`https://api.spotify.com/v1/me`, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "Bearer " + globToken,
-            "Content-Type": "application/json",
-          },
-        })
-        .then((res) => setUser(res.data.id));
+      getUser(globToken).then((res) => setUser(res.data.id));
     } else {
       return;
     }
@@ -126,6 +89,7 @@ export function CreatePlaylistPage() {
 
   return (
     <Container>
+      <NavBarContainer />
       <InputContainer>
         <SearchBar handleInput={handleInput} handleSubmit={handleTracks} />
         {selectedTracks.length > 0 && (
@@ -138,13 +102,17 @@ export function CreatePlaylistPage() {
           </Button>
         )}
       </InputContainer>
-      <ModalPlaylist
-          isOpen={opened}
-          setModal={setOpened}
+      <ModalComponents
+        title="Create Playlist"
+        isOpen={opened}
+        setModal={setOpened}
+      >
+        <FormPlaylist
           playlist={playlist}
           handleFormChange={handleFormChange}
           handleFormSubmit={handlePlaylist}
         />
+      </ModalComponents>
       <TrackContainer
         tracks={tracks}
         selectedTracks={selectedTracks}

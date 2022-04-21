@@ -34,6 +34,7 @@ export default function Login() {
     if (hash) {
       const { access_token } = getAccessToken(hash);
       dispatch(setToken(access_token));
+      console.log(access_token);
       history.push('/create-playlist');
       window.location.hash = "";
     }
