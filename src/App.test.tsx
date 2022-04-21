@@ -5,18 +5,10 @@ import { Provider } from "react-redux";
 import { CreatePlaylistPage } from "./pages/CreatePlaylistPage";
 
 test("should render search page properly", () => {
-  const access_token =
-    "BQBeNIQogiY5ErqwVe_aYqQX5mfJcR9Ydi8yO2AgW0OOWZeA3MBN4-_KfFu8h8JmawUyCIJgRKiCLnW2OLt6n57ahX_ae7JgCI8ylgcKh8CTW-bEUoFLO1Yd9mnZqar20woNd1qAQ0f8HQwCNee0mYtbKxesqi5rewRyr_pH-u2S0S-32CfUokJBR-xDXCCaKalHbmz6pwMZ6EHdSR1cQLutqEUqKzk";
-
   render(
     <Provider store={store}>
       <CreatePlaylistPage />
-    </Provider>,
-    {
-      preloadedState: {
-        token: { value: access_token },
-      },
-    }
+    </Provider>
   );
 
   const SearchElement = screen.getByText(/Search/i);
