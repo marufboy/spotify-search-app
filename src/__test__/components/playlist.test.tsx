@@ -1,7 +1,7 @@
 import { FormPlaylist } from "../../components/FormPlaylist";
-import { render, screen} from "../../store/test-utils";
+import { render, screen } from "../../store/test-utils";
 
-test("should be render modal create playlist properly", async() => {
+test("should be render modal create playlist properly", async () => {
   render(
     <FormPlaylist
       playlist={{ name: "judul", description: "playlist baru" }}
@@ -20,6 +20,5 @@ test("should be render modal create playlist properly", async() => {
   expect(ButtonPlaylist).toBeInTheDocument();
 
   //expect input type pass data before
-  expect(screen.getByDisplayValue('judul')).toBeTruthy();
-
+  expect(screen.getByDisplayValue("judul")).toBeTruthy();
 });

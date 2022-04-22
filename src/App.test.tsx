@@ -4,14 +4,19 @@ import { store } from "./store";
 import { Provider } from "react-redux";
 import { CreatePlaylistPage } from "./pages/CreatePlaylistPage";
 
-test("should render search page properly", () => {
+test("should render search page properly", async () => {
   render(
     <Provider store={store}>
       <CreatePlaylistPage />
-    </Provider>
+    </Provider>,
+    {
+      preloadedState: {
+        token: { value: "testToken" },
+      },
+    }
   );
 
-  const SearchElement = screen.getByText(/Search/i);
+  const SearchElement = screen.getByRole("button", { name: "Search" });
 
   const InputElement = screen.getByRole("textbox");
 
@@ -19,6 +24,10 @@ test("should render search page properly", () => {
   expect(InputElement).toBeInTheDocument();
 
   userEvent.type(InputElement, "tulus");
+  userEvent.click(SearchElement);
 
-  expect(screen.getByDisplayValue(/tulus/i)).toBeVisible();
+  // await waitFor(() => ).toBeTruthy());
+  expect(await screen.findAllByText(/minutes/i)).toHaveLength(16);
+
+  expect(await screen.findAllByText(/tulus/i)).toHaveLength(16);
 });

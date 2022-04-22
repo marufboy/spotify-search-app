@@ -1,24 +1,27 @@
 import styled from "@emotion/styled";
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
 import SearchBar from "../../components/SearchBar";
-import { useAppSelector } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import TrackContainer from "./container/TrackContainer";
 import { Button } from "@mantine/core";
 import { CirclePlus } from "tabler-icons-react";
-import { ModalComponents } from "../../components/ModalComponents";
+import { ModalBase } from "../../components/ModalBase";
 import { getTracks, getUser, postPlaylist, postTrackToPlaylist } from "./lib";
 import NavBarContainer from "./container/NavBarContainer";
 import { FormPlaylist } from "../../components/FormPlaylist";
+import { Item } from "../../types/spotify";
+import { setUser } from "../../store/token/userSlice";
 
 export function CreatePlaylistPage() {
   const [search, setSearch] = useState<string>("");
-  const [tracks, setTracks] = useState([]);
-  const [user, setUser] = useState("");
+  const [tracks, setTracks] = useState<Item[]>([]);
   const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
   const [playlist, setPlaylist] = useState({ name: "", description: "" });
   const [opened, setOpened] = useState<boolean>(false);
 
   const globToken = useAppSelector((state) => state.token.value);
+  const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
 
   const handleInput = (e: ChangeEvent) =>
     setSearch((e.target as HTMLInputElement).value);
@@ -28,8 +31,7 @@ export function CreatePlaylistPage() {
     const uri = `https://api.spotify.com/v1/search?q=${search}&type=track`;
     getTracks(globToken, uri)
       .then((res) => {
-        console.log(JSON.stringify(res.data.tracks.items, null, 2));
-        const data = res.data.tracks.items;
+        const data = res.data.tracks.items as Item[];
         setTracks(data);
       })
       .catch((err) => console.log(err));
@@ -43,26 +45,15 @@ export function CreatePlaylistPage() {
         description: playlist.description,
         public: false,
       };
-      postPlaylist(globToken, user, data)
+      postPlaylist(globToken, user.id, data)
         .then((res) => {
           const playlistID = res.data.id;
-          postTrackToPlaylist(globToken, user, playlistID, selectedTracks);
+          postTrackToPlaylist(globToken, user.id, playlistID, selectedTracks);
         })
         .catch((err) => console.log(err.message));
-
-      alert("Successfully added playlist");
       setPlaylist({ name: "", description: "" });
     } else {
-      alert("Please add your select playlist");
       setPlaylist({ name: "", description: "" });
-    }
-  };
-
-  const handleUser = async () => {
-    if (globToken !== "") {
-      getUser(globToken).then((res) => setUser(res.data.id));
-    } else {
-      return;
     }
   };
 
@@ -84,8 +75,18 @@ export function CreatePlaylistPage() {
   };
 
   useEffect(() => {
-    handleUser();
-  });
+    getUser(globToken).then((res) => {
+      const response = res.data;
+      dispatch(
+        setUser({
+          id: response.id,
+          name: response.display_name,
+          profilImg: response.images[0].url,
+          spotifyUrl: response.external_urls.spotify,
+        })
+      );
+    });
+  }, [user]);
 
   return (
     <Container>
@@ -102,7 +103,7 @@ export function CreatePlaylistPage() {
           </Button>
         )}
       </InputContainer>
-      <ModalComponents
+      <ModalBase
         title="Create Playlist"
         isOpen={opened}
         setModal={setOpened}
@@ -112,7 +113,7 @@ export function CreatePlaylistPage() {
           handleFormChange={handleFormChange}
           handleFormSubmit={handlePlaylist}
         />
-      </ModalComponents>
+      </ModalBase>
       <TrackContainer
         tracks={tracks}
         selectedTracks={selectedTracks}

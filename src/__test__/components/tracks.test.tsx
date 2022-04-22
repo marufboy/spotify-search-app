@@ -29,7 +29,7 @@ test("should render track components properly", () => {
   );
 
   //   expect title
-  expect(screen.getAllByText(/tulus/i)).toBeTruthy();
+  expect(screen.getAllByText(/tulus/i)).toHaveLength(16);
   expect(
     screen.getByRole("heading", {
       name: /hati\-hati di jalan \- tulus/i,
@@ -40,5 +40,5 @@ test("should render track components properly", () => {
   expect(screen.getByText(/4:02 minutes/i)).toBeVisible();
 
   const SelectButton = screen.getAllByText(/Select/i);
-  expect(SelectButton).toBeTruthy();
+  expect(SelectButton).toHaveLength(16);
 });

@@ -1,16 +1,9 @@
 import styled from "@emotion/styled";
 import Album from "../../../components/Album";
-
-interface ISongs {
-  uri: string;
-  name: string;
-  artists: { name: string }[];
-  album: { images: { url: string }[] };
-  duration_ms: number;
-}
+import { Item } from "../../../types/spotify";
 
 interface ITrackContainer {
-  tracks: ISongs[];
+  tracks: Item[];
   selectedTracks: string[];
   handleSelected: (id: string) => void;
 }

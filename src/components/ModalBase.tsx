@@ -8,7 +8,7 @@ interface IModal {
   children: JSX.Element;
 }
 
-export const ModalComponents = ({ title, isOpen, setModal, children }: IModal) => (
+export const ModalBase = ({ title, isOpen, setModal, children }: IModal) => (
   <Modal
     centered
     title={title}
