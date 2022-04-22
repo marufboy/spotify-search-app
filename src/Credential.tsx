@@ -1,7 +1,7 @@
 export const Credential = () => {
   return {
     AuthEndPoint: "https://accounts.spotify.com/authorize?",
-    RedirectUrl: process.env.REACT_APP_REDIRECT_URL,
+    RedirectUrl: process.env.REACT_APP_SPOTIFY_REDIRECT_URL,
     Scopes: [
       "playlist-modify-private",
       "user-read-private",
