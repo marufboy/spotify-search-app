@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Item } from "../../../types/spotify";
 
 export function getUser(globToken: string) {
   return axios.get(`https://api.spotify.com/v1/me`, {
@@ -47,11 +48,12 @@ export function postTrackToPlaylist(
   globToken: string,
   user: string,
   playlistID: string,
-  selectedTracks: string[]
+  selectedTracks: Item[]
 ) {
+  const uriSelectedTracks = selectedTracks.map(track => track.uri);
   return axios.post(
     `https://api.spotify.com/v1/users/${user}/playlists/${playlistID}/tracks`,
-    selectedTracks,
+    uriSelectedTracks,
     {
       headers: {
         Accept: "application/json",

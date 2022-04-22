@@ -4,8 +4,8 @@ import { Item } from "../../../types/spotify";
 
 interface ITrackContainer {
   tracks: Item[];
-  selectedTracks: string[];
-  handleSelected: (id: string) => void;
+  selectedTracks: Item[];
+  handleSelected: (track: Item) => void;
 }
 
 const TrackContainer = ({
@@ -17,14 +17,14 @@ const TrackContainer = ({
     <TracksContainer>
       {tracks.length > 0 &&
         tracks.map((track) => {
-          return selectedTracks.includes(track.uri) ? (
+          return selectedTracks.some(select => select.uri === track.uri) ? (
             <Album
               key={track.uri}
               image={track.album.images[0].url}
               title={track.name}
               artist={track.artists[0].name}
               duration={track.duration_ms}
-              select={() => handleSelected(track.uri)}
+              select={() => handleSelected(track)}
               isSelect={false}
             />
           ) : (
@@ -34,7 +34,7 @@ const TrackContainer = ({
               title={track.name}
               artist={track.artists[0].name}
               duration={track.duration_ms}
-              select={() => handleSelected(track.uri)}
+              select={() => handleSelected(track)}
               isSelect={true}
             />
           );

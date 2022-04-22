@@ -1,21 +1,19 @@
 import styled from "@emotion/styled";
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
-import SearchBar from "../../components/SearchBar";
 import { useAppDispatch, useAppSelector } from "../../hooks";
 import TrackContainer from "./container/TrackContainer";
-import { Button } from "@mantine/core";
-import { CirclePlus } from "tabler-icons-react";
 import { ModalBase } from "../../components/ModalBase";
 import { getTracks, getUser, postPlaylist, postTrackToPlaylist } from "./lib";
 import NavBarContainer from "./container/NavBarContainer";
 import { FormPlaylist } from "../../components/FormPlaylist";
 import { Item } from "../../types/spotify";
 import { setUser } from "../../store/token/userSlice";
+import SearchBarContainer from "./container/SearchBarContainer";
 
 export function CreatePlaylistPage() {
   const [search, setSearch] = useState<string>("");
   const [tracks, setTracks] = useState<Item[]>([]);
-  const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
+  const [selectedTracks, setSelectedTracks] = useState<Item[]>([]);
   const [playlist, setPlaylist] = useState({ name: "", description: "" });
   const [opened, setOpened] = useState<boolean>(false);
 
@@ -57,15 +55,15 @@ export function CreatePlaylistPage() {
     }
   };
 
-  const handleSelected = (id: string) => {
+  const handleSelected = (track: Item) => {
     const alreadySelected = selectedTracks.find(
-      (selectedId) => selectedId === id
+      (selected) => selected.uri === track.uri
     );
     if (alreadySelected) {
-      const filterSelected = selectedTracks.filter((item) => item !== id);
+      const filterSelected = selectedTracks.filter((item) => item.uri !== track.uri);
       setSelectedTracks(filterSelected);
     } else {
-      setSelectedTracks((selectedTrack): string[] => [...selectedTrack, id]);
+      setSelectedTracks((selectedTrack): Item[] => [...selectedTrack, track]);
     }
   };
 
@@ -91,23 +89,13 @@ export function CreatePlaylistPage() {
   return (
     <Container>
       <NavBarContainer />
-      <InputContainer>
-        <SearchBar handleInput={handleInput} handleSubmit={handleTracks} />
-        {selectedTracks.length > 0 && (
-          <Button
-            leftIcon={<CirclePlus color="white" size={18} />}
-            color="green"
-            onClick={() => setOpened(true)}
-          >
-            Create Playlist
-          </Button>
-        )}
-      </InputContainer>
-      <ModalBase
-        title="Create Playlist"
-        isOpen={opened}
-        setModal={setOpened}
-      >
+      <SearchBarContainer
+        selectedTracks={selectedTracks}
+        handleInput={handleInput}
+        handleTracks={handleTracks}
+        setOpened={setOpened}
+      />
+      <ModalBase title="Create Playlist" isOpen={opened} setModal={setOpened}>
         <FormPlaylist
           playlist={playlist}
           handleFormChange={handleFormChange}
@@ -131,13 +119,4 @@ const Container = styled.div`
   flex-direction: column;
   background: linear-gradient(transparent, rgba(0, 0, 0, 1));
   background-color: #333;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin-top: 20px;
-  margin-left: 25px;
-  gap: 1.2rem;
-  justify-content: flex-start;
 `;

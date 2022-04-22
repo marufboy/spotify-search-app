@@ -1,7 +1,7 @@
 import { FormPlaylist } from "../../components/FormPlaylist";
 import { render, screen } from "../../store/test-utils";
 
-test("should be render modal create playlist properly", async () => {
+test("should be render modal create playlist properly", () => {
   render(
     <FormPlaylist
       playlist={{ name: "judul", description: "playlist baru" }}
