@@ -9,6 +9,7 @@ import { FormPlaylist } from "../../components/FormPlaylist";
 import { Item } from "../../types/spotify";
 import { setUser } from "../../store/token/userSlice";
 import SearchBarContainer from "./container/SearchBarContainer";
+import SelectedTracksContainer from "./container/SelectedTrackContainer";
 
 export function CreatePlaylistPage() {
   const [search, setSearch] = useState<string>("");
@@ -16,6 +17,7 @@ export function CreatePlaylistPage() {
   const [selectedTracks, setSelectedTracks] = useState<Item[]>([]);
   const [playlist, setPlaylist] = useState({ name: "", description: "" });
   const [opened, setOpened] = useState<boolean>(false);
+  const [isSwitch, setSwitch] = useState<boolean>(true);
 
   const globToken = useAppSelector((state) => state.token.value);
   const user = useAppSelector((state) => state.user);
@@ -60,7 +62,9 @@ export function CreatePlaylistPage() {
       (selected) => selected.uri === track.uri
     );
     if (alreadySelected) {
-      const filterSelected = selectedTracks.filter((item) => item.uri !== track.uri);
+      const filterSelected = selectedTracks.filter(
+        (item) => item.uri !== track.uri
+      );
       setSelectedTracks(filterSelected);
     } else {
       setSelectedTracks((selectedTrack): Item[] => [...selectedTrack, track]);
@@ -88,25 +92,38 @@ export function CreatePlaylistPage() {
 
   return (
     <Container>
-      <NavBarContainer />
-      <SearchBarContainer
-        selectedTracks={selectedTracks}
-        handleInput={handleInput}
-        handleTracks={handleTracks}
-        setOpened={setOpened}
-      />
-      <ModalBase title="Create Playlist" isOpen={opened} setModal={setOpened}>
-        <FormPlaylist
-          playlist={playlist}
-          handleFormChange={handleFormChange}
-          handleFormSubmit={handlePlaylist}
+      <NavBarContainer handleSwitch={setSwitch} />
+      {isSwitch ? (
+        <>
+          <SearchBarContainer
+            selectedTracks={selectedTracks}
+            handleInput={handleInput}
+            handleTracks={handleTracks}
+            setOpened={setOpened}
+          />
+          <ModalBase
+            title="Create Playlist"
+            isOpen={opened}
+            setModal={setOpened}
+          >
+            <FormPlaylist
+              playlist={playlist}
+              handleFormChange={handleFormChange}
+              handleFormSubmit={handlePlaylist}
+            />
+          </ModalBase>
+          <TrackContainer
+            tracks={tracks}
+            selectedTracks={selectedTracks}
+            handleSelected={handleSelected}
+          />
+        </>
+      ) : (
+        <SelectedTracksContainer
+          handleSelected={handleSelected}
+          selectedTracks={selectedTracks}
         />
-      </ModalBase>
-      <TrackContainer
-        tracks={tracks}
-        selectedTracks={selectedTracks}
-        handleSelected={handleSelected}
-      />
+      )}
     </Container>
   );
 }
