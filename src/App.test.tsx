@@ -1,31 +1,33 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "./store/test-utils";
 import userEvent from "@testing-library/user-event";
 import { store } from "./store";
 import { Provider } from "react-redux";
-import { MantineProvider } from "@mantine/core";
 import { CreatePlaylistPage } from "./pages/CreatePlaylistPage";
-
 
 test("should render search page properly", async () => {
   render(
     <Provider store={store}>
-      <MantineProvider theme={{ colorScheme: "dark" }}>
-        <CreatePlaylistPage />
-      </MantineProvider>
-    </Provider>
+      <CreatePlaylistPage />
+    </Provider>,
+    {
+      preloadedState: {
+        token: { value: "testToken" },
+      },
+    }
   );
 
-  const SearchElement = screen.getByText(/Search/i);
+  const SearchElement = screen.getByRole("button", { name: "Search" });
 
   const InputElement = screen.getByRole("textbox");
 
-  fireEvent.change(InputElement, { target: { value: "tulus" } });
+  expect(SearchElement).toBeInTheDocument();
+  expect(InputElement).toBeInTheDocument();
 
+  userEvent.type(InputElement, "tulus");
   userEvent.click(SearchElement);
 
-  expect( await screen.findAllByText('Search')).toBeInTheDocument();
-  expect( await screen.findByRole('textbox')).toBeInTheDocument();
+  // await waitFor(() => ).toBeTruthy());
+  expect(await screen.findAllByText(/minutes/i)).toHaveLength(16);
 
-  expect( await screen.findAllByText('Tulus')).toBeVisible();
-  expect( await screen.findAllByText('Diri')).toBeVisible();
+  expect(await screen.findAllByText(/tulus/i)).toHaveLength(16);
 });

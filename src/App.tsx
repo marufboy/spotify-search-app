@@ -1,4 +1,3 @@
-import "./App.css";
 import { BrowserRouter, Redirect, Route, Switch } from "react-router-dom";
 import Login from "./components/Login";
 import { useAppSelector } from "./hooks";
@@ -8,7 +7,6 @@ import { CreatePlaylistPage } from "./pages/CreatePlaylistPage";
 function App() {
   const globToken = useAppSelector((state) => state.token.value);
   return (
-    <div>
       <BrowserRouter>
         <Switch>
           <Route path={"/create-playlist"}>
@@ -22,7 +20,6 @@ function App() {
           </Route>
         </Switch>
       </BrowserRouter>
-    </div>
   );
 }
 

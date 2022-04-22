@@ -1,11 +1,14 @@
 import { rest } from "msw";
 import MockTrackResponse from "./response/MockTrackResponse";
-
-const _url = 'https://api.spotify.com/v1/search?q=tulus&type=track&limit=16&offset=0';
+import MockUserResponse from "./response/MockUserResponse";
 
 export const handlers = [
-    rest.get(_url, (req, res, ctx) => {
-        console.debug(`${req.url.searchParams}`)
-        return res(ctx.json(MockTrackResponse))
-    })
-]
+  rest.get("https://api.spotify.com/v1/search", (req, res, ctx) => {
+    console.debug(`${req.url.searchParams}`);
+    return res(ctx.json(MockTrackResponse));
+  }),
+  rest.get("https://api.spotify.com/v1/me", (req, res, ctx) => {
+    console.debug(req.headers);
+    return res(ctx.json(MockUserResponse));
+  }),
+];

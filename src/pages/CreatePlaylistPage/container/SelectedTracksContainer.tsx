@@ -2,22 +2,20 @@ import styled from "@emotion/styled";
 import Album from "../../../components/Album";
 import { Item } from "../../../types/spotify";
 
-interface ITrackContainer {
-  tracks: Item[];
+interface ISelectedTracksContainer {
   selectedTracks: Item[];
   handleSelected: (track: Item) => void;
 }
 
-const TrackContainer = ({
-  tracks,
+const SelectedTracksContainer = ({
   selectedTracks,
   handleSelected,
-}: ITrackContainer) => {
+}: ISelectedTracksContainer) => {
   return (
-    <TracksContainer>
-      {tracks.length > 0 &&
-        tracks.map((track) => {
-          return selectedTracks.some(select => select.uri === track.uri) ? (
+    <SelectedTrackContainer>
+      {selectedTracks.length > 0 &&
+        selectedTracks.map((track) => {
+          return (
             <Album
               key={track.uri}
               image={track.album.images[0].url}
@@ -27,29 +25,19 @@ const TrackContainer = ({
               select={() => handleSelected(track)}
               isSelect={false}
             />
-          ) : (
-            <Album
-              key={track.uri}
-              image={track.album.images[0].url}
-              title={track.name}
-              artist={track.artists[0].name}
-              duration={track.duration_ms}
-              select={() => handleSelected(track)}
-              isSelect={true}
-            />
           );
         })}
-    </TracksContainer>
+    </SelectedTrackContainer>
   );
 };
 
-export default TrackContainer;
+export default SelectedTracksContainer;
 
-const TracksContainer = styled.div`
+const SelectedTrackContainer = styled.div`
   margin: 0 auto;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-gap: 10px;
-  margin-top: 20px;
+  margin-top: 80px;
   margin-bottom: 20px;
 `;

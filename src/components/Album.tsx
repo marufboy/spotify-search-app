@@ -5,7 +5,7 @@ interface IAlbum {
   image: string;
   title: string;
   artist: string;
-  duration: string;
+  duration: number;
   select: () => void;
   isSelect: boolean;
 }
@@ -35,20 +35,18 @@ const Album = ({
       <img src={image} alt="album image" />
     </SongLogo>
     <DetailTrack>
-      <h1>{title}</h1>
-      <p>{artist}</p>
-      <p>{milistToMinute(parseInt(duration))}</p>
+      <h1>{title} - {artist}</h1>
+      <p>{milistToMinute(duration)}</p>
       <Button color={colorButton(isSelect)} onClick={select}>
         {isSelect ? "Select" : "Deselect"}
       </Button>
-      {/* <button onClick={select}>{isSelect ? 'Select' : 'Deselect'}</button> */}
     </DetailTrack>
   </SongTrack>
 );
 
 const SongTrack = styled.div`
-  margin: 2px;
   width: 80vh;
+  height: 18vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -70,19 +68,28 @@ const SongLogo = styled.div`
 
 const DetailTrack = styled.div`
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
   text-align: left;
   color: white;
   h1 {
-    line-height: 5px;
+    flex: 2;
+    margin: 0;
     font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
     font-size: 1.5rem;
     font-weight: bold;
     color: white;
   }
   p {
-    line-height: 20px;
+    flex: 1;
+    margin: 0;
     font-size: 1rem;
     color: #efefef;
+  }
+  Button{
+    margin-top: 3px;
+    width: 25%;
   }
 `;
 

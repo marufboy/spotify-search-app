@@ -10,7 +10,7 @@ interface ISearch {
 
 const SearchBar = ({ handleInput, handleSubmit }: ISearch) => (
   <Form onSubmit={handleSubmit}>
-    <SearchInput onChange={handleInput} />
+    <SearchInput onChange={handleInput} name="input-music"/>
     <Button color="green" type="submit">
       Search
     </Button>

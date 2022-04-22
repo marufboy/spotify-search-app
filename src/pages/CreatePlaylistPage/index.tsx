@@ -1,22 +1,27 @@
 import styled from "@emotion/styled";
-import axios from "axios";
 import { ChangeEvent, FormEvent, useState, useEffect } from "react";
-import SearchBar from "../../components/SearchBar";
-import { useAppSelector } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks";
 import TrackContainer from "./container/TrackContainer";
-import { Button } from "@mantine/core";
-import { CirclePlus } from "tabler-icons-react";
-import { ModalPlaylist } from "../../components/ModalPLaylist";
+import { ModalBase } from "../../components/ModalBase";
+import { getTracks, getUser, postPlaylist, postTrackToPlaylist } from "./lib";
+import NavBarContainer from "./container/NavBarContainer";
+import { FormPlaylist } from "../../components/FormPlaylist";
+import { Item } from "../../types/spotify";
+import { setUser } from "../../store/token/userSlice";
+import SearchBarContainer from "./container/SearchBarContainer";
+import SelectedTracksContainer from "./container/SelectedTracksContainer";
 
 export function CreatePlaylistPage() {
-  const [search, setSearch] = useState<string | null>();
-  const [tracks, setTracks] = useState([]);
-  const [user, setUser] = useState([]);
-  const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
+  const [search, setSearch] = useState<string>("");
+  const [tracks, setTracks] = useState<Item[]>([]);
+  const [selectedTracks, setSelectedTracks] = useState<Item[]>([]);
   const [playlist, setPlaylist] = useState({ name: "", description: "" });
   const [opened, setOpened] = useState<boolean>(false);
+  const [isSwitch, setSwitch] = useState<boolean>(true);
 
   const globToken = useAppSelector((state) => state.token.value);
+  const user = useAppSelector((state) => state.user);
+  const dispatch = useAppDispatch();
 
   const handleInput = (e: ChangeEvent) =>
     setSearch((e.target as HTMLInputElement).value);
@@ -24,94 +29,45 @@ export function CreatePlaylistPage() {
   const handleTracks = async (e: FormEvent) => {
     e.preventDefault();
     const uri = `https://api.spotify.com/v1/search?q=${search}&type=track`;
-    axios
-      .get(uri, {
-        params: { limit: 16, offset: 0 },
-        headers: {
-          Accept: "application/json",
-          Authorization: "Bearer " + globToken,
-          "Content-Type": "application/json",
-        },
-      })
+    getTracks(globToken, uri)
       .then((res) => {
-        const items = res.data.tracks.items;
-        setTracks(items);
-        console.log(items);
-        console.log('this is typeof items',typeof items);
-      });
+        const data = res.data.tracks.items as Item[];
+        setTracks(data);
+      })
+      .catch((err) => console.log(err));
   };
 
   const handlePlaylist = async (e: FormEvent) => {
     e.preventDefault();
-    if (
-      playlist.name.length > 10 &&
-      playlist.description !== "" &&
-      tracks.length > 0
-    ) {
+    if (playlist.name.length > 10 && playlist.description !== "") {
       const data = {
         name: playlist.name,
         description: playlist.description,
         public: false,
       };
-      axios
-        .post(`https://api.spotify.com/v1/users/${user}/playlists`, data, {
-          headers: {
-            Accept: "application/json",
-            // Authorization: "Bearer " + token,
-            Authorization: "Bearer " + globToken,
-            "Content-Type": "application/json",
-          },
-        })
+      postPlaylist(globToken, user.id, data)
         .then((res) => {
           const playlistID = res.data.id;
-          axios.post(
-            `https://api.spotify.com/v1/users/${user}/playlists/${playlistID}/tracks`,
-            tracks,
-            {
-              headers: {
-                Accept: "application/json",
-                // Authorization: "Bearer " + token,
-                Authorization: "Bearer " + globToken,
-                "Content-Type": "application/json",
-              },
-            }
-          );
+          postTrackToPlaylist(globToken, user.id, playlistID, selectedTracks);
         })
         .catch((err) => console.log(err.message));
-
-      alert("Successfully added playlist");
       setPlaylist({ name: "", description: "" });
     } else {
-      alert("Please add your select playlist");
       setPlaylist({ name: "", description: "" });
     }
   };
 
-  const handleUser = async () => {
-    if (globToken !== "") {
-      axios
-        .get(`https://api.spotify.com/v1/me`, {
-          headers: {
-            Accept: "application/json",
-            Authorization: "Bearer " + globToken,
-            "Content-Type": "application/json",
-          },
-        })
-        .then((res) => setUser(res.data.id));
-    } else {
-      return;
-    }
-  };
-
-  const handleSelected = (id: string) => {
+  const handleSelected = (track: Item) => {
     const alreadySelected = selectedTracks.find(
-      (selectedId) => selectedId === id
+      (selected) => selected.uri === track.uri
     );
     if (alreadySelected) {
-      const filterSelected = selectedTracks.filter((item) => item !== id);
+      const filterSelected = selectedTracks.filter(
+        (item) => item.uri !== track.uri
+      );
       setSelectedTracks(filterSelected);
     } else {
-      setSelectedTracks((selectedTrack): string[] => [...selectedTrack, id]);
+      setSelectedTracks((selectedTrack): Item[] => [...selectedTrack, track]);
     }
   };
 
@@ -121,35 +77,53 @@ export function CreatePlaylistPage() {
   };
 
   useEffect(() => {
-    handleUser();
-  });
+    getUser(globToken).then((res) => {
+      const response = res.data;
+      dispatch(
+        setUser({
+          id: response.id,
+          name: response.display_name,
+          profilImg: response.images[0].url,
+          spotifyUrl: response.external_urls.spotify,
+        })
+      );
+    });
+  }, [user]);
 
   return (
     <Container>
-      <InputContainer>
-        <SearchBar handleInput={handleInput} handleSubmit={handleTracks} />
-        {selectedTracks.length > 0 && (
-          <Button
-            leftIcon={<CirclePlus color="white" size={18} />}
-            color="green"
-            onClick={() => setOpened(true)}
+      <NavBarContainer handleSwitch={setSwitch} />
+      {isSwitch ? (
+        <>
+          <SearchBarContainer
+            selectedTracks={selectedTracks}
+            handleInput={handleInput}
+            handleTracks={handleTracks}
+            setOpened={setOpened}
+          />
+          <ModalBase
+            title="Create Playlist"
+            isOpen={opened}
+            setModal={setOpened}
           >
-            Create Playlist
-          </Button>
-        )}
-      </InputContainer>
-      <ModalPlaylist
-          isOpen={opened}
-          setModal={setOpened}
-          playlist={playlist}
-          handleFormChange={handleFormChange}
-          handleFormSubmit={handlePlaylist}
+            <FormPlaylist
+              playlist={playlist}
+              handleFormChange={handleFormChange}
+              handleFormSubmit={handlePlaylist}
+            />
+          </ModalBase>
+          <TrackContainer
+            tracks={tracks}
+            selectedTracks={selectedTracks}
+            handleSelected={handleSelected}
+          />
+        </>
+      ) : (
+        <SelectedTracksContainer
+          handleSelected={handleSelected}
+          selectedTracks={selectedTracks}
         />
-      <TrackContainer
-        tracks={tracks}
-        selectedTracks={selectedTracks}
-        handleSelected={handleSelected}
-      />
+      )}
     </Container>
   );
 }
@@ -162,13 +136,4 @@ const Container = styled.div`
   flex-direction: column;
   background: linear-gradient(transparent, rgba(0, 0, 0, 1));
   background-color: #333;
-`;
-
-const InputContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  margin-top: 20px;
-  margin-left: 25px;
-  gap: 1.2rem;
-  justify-content: flex-start;
 `;
