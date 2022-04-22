@@ -9,7 +9,7 @@ import { FormPlaylist } from "../../components/FormPlaylist";
 import { Item } from "../../types/spotify";
 import { setUser } from "../../store/token/userSlice";
 import SearchBarContainer from "./container/SearchBarContainer";
-import SelectedTracksContainer from "./container/SelectedTrackContainer";
+import SelectedTracksContainer from "./container/SelectedTracksContainer";
 
 export function CreatePlaylistPage() {
   const [search, setSearch] = useState<string>("");
