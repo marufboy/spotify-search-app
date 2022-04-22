@@ -4,7 +4,7 @@
 My final project with consume Spotify API to create a playlist in your Spotify account.
 
 ## Scrennshots App
-![Spotify Search App](/screenshot.png)
+![Spotify Search App](/screenshots.png)
 
 ## Features
 - Search music
